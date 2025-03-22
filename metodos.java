@@ -6,6 +6,7 @@ public class metodos
 {
     public Stack<objRopa> LlenarPila() 
     {
+        //este metodo solo es el objeto, el que hace el llenado es validarYactPrenda
         Stack<objRopa> pila = new Stack<>();//Declara variable pila de tipo obj, la pila es una coleccion de objeto
         boolean continuar = true;
         String agregar = "";
@@ -13,35 +14,35 @@ public class metodos
         while (continuar) 
         {
             objRopa o = new objRopa();
-            o.setMarca(JOptionPane.showInputDialog("Ingrese la marca del repuesto"));
-            ingreso =  JOptionPane.showInputDialog(null, "Ingrese la referencia del repuesto");
+            o.setMarca(JOptionPane.showInputDialog("Ingrese la marca de la prenda"));
+            ingreso =  JOptionPane.showInputDialog(null, "Ingrese la referencia de la prenda");
             while (!ingreso.matches("\\d+")) 
             {
                 JOptionPane.showMessageDialog(null, "Dato no valido, reintente");
                 ingreso =  JOptionPane.showInputDialog(null, "Ingrese la referencia valida");
             }
             o.setReferencia(Integer.parseInt(ingreso));
-            ingreso =  JOptionPane.showInputDialog(null, "Ingrese la cantidad de repuestos");
+            ingreso =  JOptionPane.showInputDialog(null, "Ingrese la cantidad de prendas");
             while (!ingreso.matches("\\d+")) 
             {
                 JOptionPane.showMessageDialog(null, "Dato no valido, reintente");
                 ingreso =  JOptionPane.showInputDialog(null, "Ingrese cantidad valida");
             }
             o.setCantidad(Integer.parseInt(ingreso));
-            ingreso =  JOptionPane.showInputDialog(null, "Ingrese el precio del repuesto");
+            ingreso =  JOptionPane.showInputDialog(null, "Ingrese el precio de la prenda");
             while (!ingreso.matches("\\d+(\\.\\d+)?")) 
             {
                 JOptionPane.showMessageDialog(null, "Dato no valido, reintente");
                 ingreso =  JOptionPane.showInputDialog(null, "Ingrese precio valido");
             }
             o.setPrecio(Double.parseDouble(ingreso));
-            pila.push(o);//Aqui llevo los datos a la pila 
-            JOptionPane.showMessageDialog(null, "Repuesto agregado con exito");
+            //pila.push(o);//Aqui llevo los datos a la pila 
             agregar = JOptionPane.showInputDialog("Desea agregar mas Registros S/N");
             if (agregar.equalsIgnoreCase("N"))
             {
                 continuar = false;
             }
+            pila =  validarYactPrenda(pila, o);
         }
         return pila;
     }
@@ -65,6 +66,7 @@ public class metodos
         int opc = Integer.parseInt(JOptionPane.showInputDialog("Consultar\n" + "1: Por marca\n" + "2: Por referencia\n"));
         String marcaBusc = "";
         int refBusc = 0;
+        boolean encontr = false;
         if(opc == 1)
         {
             marcaBusc = JOptionPane.showInputDialog(null, "Ingrese la marca a buscar");
@@ -79,7 +81,8 @@ public class metodos
             {
                 if(ropa.getMarca().equalsIgnoreCase(marcaBusc))
                 {
-                    JOptionPane.showMessageDialog(null, "Datos del repuesto buscado\n"+
+                    encontr = true; 
+                    JOptionPane.showMessageDialog(null, "Datos de la prenda buscada\n"+
                          "Marca:" + ropa.getMarca()+"\n" + "Referencia: " + ropa.getReferencia() +"\n" +
                          "Cantidad: " + ropa.getCantidad() + "\n" + "Precio: " + ropa.getPrecio() ); 
                     return;
@@ -89,16 +92,17 @@ public class metodos
             {
                 if(ropa.getReferencia() == refBusc) // == porque referencia es una entero too double 
                 {
-                JOptionPane.showMessageDialog(null, "Datos de la prenda buscada\n"+
+                    encontr = true; 
+                    JOptionPane.showMessageDialog(null, "Datos de la prenda buscada\n"+
                          "Marca:" + ropa.getMarca()+"\n" + "Referencia: " + ropa.getReferencia() +"\n" +
                          "Cantidad: " + ropa.getCantidad() + "\n" + "Precio: " + ropa.getPrecio() ); 
                 return;
                 }
-                else
-                {
-                    JOptionPane.showMessageDialog(null, "Prenda no encontrada");
-                }
             }
+        }
+        if(!encontr)
+        {
+            JOptionPane.showMessageDialog(null, "Prenda no encontrada");
         }
     }
     public void modifPrenda(Stack<objRopa> pila)
@@ -162,6 +166,11 @@ public class metodos
             return;
         }
         int opc = Integer.parseInt(JOptionPane.showInputDialog("Consultar\n" + "1: Por marca\n" + "2: Por referencia\n"));
+        while (opc != 1 && opc != 2) 
+        {
+            JOptionPane.showMessageDialog(null, "Opción no valida, ingrese 1 ó 2");
+            return;
+        }
         String marcaBusc = "";
         int refBusc = 0;
         boolean encontrado = false;
@@ -235,6 +244,74 @@ public class metodos
         if(!encontrado)
         {
             JOptionPane.showMessageDialog(null, "Repuesto no encontrado");
+        }
+    }
+    public Stack<objRopa> validarYactPrenda(Stack<objRopa> pila, objRopa LlenarPila )
+    {
+        boolean encontrado = false;
+        for(objRopa ropa : pila)
+        {
+            if (ropa.getMarca().equalsIgnoreCase(LlenarPila.getMarca()) && ropa.getReferencia() == LlenarPila.getReferencia()) 
+            {
+                ropa.setCantidad(ropa.getCantidad() + LlenarPila.getCantidad());
+                encontrado = true;
+                JOptionPane.showMessageDialog(null, "La prenda ya existe, se ha actualizado la cantidad");
+                break;
+            }
+        }
+        if(!encontrado)
+        {
+            pila.push(LlenarPila);
+            JOptionPane.showMessageDialog(null, "Prenda ingresada correctamente");
+        }
+        return pila; 
+    } 
+    public void consultarStock(Stack<objRopa> pila)
+    {
+        while (pila.empty()) 
+        {
+            JOptionPane.showMessageDialog(null, "No hay repuestos ingresados");
+            //pila = LlenarPila(); //para me lleve directamente al metodo llenar y no al menu y comento el return
+            return;
+        }
+        int opc = Integer.parseInt(JOptionPane.showInputDialog("Consultar\n" + "1: Por marca\n" + "2: Por referencia\n"));
+        String marcaBusc = "";
+        int refBusc = 0;
+        boolean encontrado = false;
+        if(opc == 1)
+        {
+            marcaBusc = JOptionPane.showInputDialog(null, "Ingrese la marca a buscar");
+        }
+        else
+        {
+            refBusc = Integer.parseInt(JOptionPane.showInputDialog("Ingrese la referencia a buscar"));
+        }
+        for(objRopa ropa : pila)
+        {
+            if(opc == 1)
+            {
+                if(ropa.getMarca().equalsIgnoreCase(marcaBusc))
+                {
+                    encontrado = true;
+                    JOptionPane.showMessageDialog(null, "Stock de la prenda buscada\n"+
+                         "Cantidad: " + ropa.getCantidad() ); 
+                    return;
+                }
+            }
+            else
+            {
+                if(ropa.getReferencia() == refBusc) // == porque referencia es una entero too double 
+                {
+                    encontrado = true;
+                    JOptionPane.showMessageDialog(null, "Stock de la prenda buscada\n"+
+                         "Cantidad: " + ropa.getCantidad()); 
+                    return;
+                }
+            }
+        }
+        if(!encontrado)
+        {
+            JOptionPane.showMessageDialog(null, "Prenda no encontrada");   
         }
     }
 }
